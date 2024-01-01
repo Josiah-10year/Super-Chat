@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import './App.css';
 
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/auth';
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';  
 
 import {useAuthState} from 'react-firebase-hooks/auth';
-import {useCollection, useCollectionData} from 'react-firebase-hooks/firestore';
+import {useCollectionData} from 'react-firebase-hooks/firestore';
 
 firebase.initializeApp({
   apiKey: "AIzaSyBvDuAcrqb8LDTq-Cgy-8XdPiPYyR1kfZ0",
@@ -22,14 +22,18 @@ const firestore = firebase.firestore();//store sdk as variable
 
 
 function App() {
+
+  const [user] = useAuthState(auth);
+
   return (
     <div className="App">
-      <header className="App-header">
-        
+      <header >
+        SuperChat
+        <SignOut />
       </header>
 
       <section>
-        {user ? <ChatRoom /> : <SignIn />}//turanary operator if user show chatroom else show sign in
+        {user ? <ChatRoom /> : <SignIn />}
       </section>
 
     </div>
@@ -37,9 +41,17 @@ function App() {
 }
 
 function SignIn() {
+
+  const signInWithGoogle = () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+  }
   
   return(
-    <button onClick={() => signInWithGoogle()}>Sign in with Google</button>
+    <>
+      <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
+      <p>Do not violate</p>
+    </>
   )
 }
 
@@ -50,6 +62,7 @@ function SignOut(){
 }
 
 function ChatRoom(){
+  const dummy = useRef();
 
   const msgRef = firestore.collection('messages');//ref to database
   const query = msgRef.orderBy('createdAt').limit(25);//subset of doc 
