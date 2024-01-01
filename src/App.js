@@ -56,14 +56,36 @@ function ChatRoom(){
 
   const[messages] = useCollectionData(query, {idField: 'id'});//listen to updates real time
 
+  const [formValue, setFormValue] = React.useState('');
+
+  const sendMessage = async(e) => {
+    e.preventDefault();
+
+    const {uid, photoURL} = auth.currentUser;
+
+    await msgRef.add({//creatiion of doc in db
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid, 
+      photoURL
+    })
+
+    setFormValue('');
+  }
+
   return(
     <>
     <div>
-      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}//sends key prop & msg ID
+      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
     </div>
 
-    <div>
-    </div>
+    
+    <form>
+      <input value={formValue} onChange={(e)=> setFormValue(e.target.value)}/>
+
+      <button type="submit">Send</button>
+      
+    </form>
     </> 
     )
 
@@ -72,7 +94,15 @@ function ChatRoom(){
 function ChatMessage(props){
   const {text, uid, photoURL} = props.message;
 
-  return <p>{text}</p>  
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received'; 
+
+  return(
+    <div className={`message ${messageClass}`}>
+
+      <img src={photoURL}/>
+      <p>{text}</p>
+    </div>
+  )
 }
 
 export default App;
