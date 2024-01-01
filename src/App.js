@@ -69,7 +69,7 @@ function ChatRoom(){
 
   const[messages] = useCollectionData(query, {idField: 'id'});//listen to updates real time
 
-  const [formValue, setFormValue] = React.useState('');
+  const [formValue, setFormValue] = useState('');
 
   const sendMessage = async(e) => {
     e.preventDefault();
@@ -84,19 +84,21 @@ function ChatRoom(){
     })
 
     setFormValue('');
+    dummy.current.scrollIntoView({behaviour:'smooth'});
   }
 
-  return(
-    <>
-    <div>
-      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
-    </div>
+  return(<>
+    <main>
 
+      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+      <span ref={dummy}></span>
     
-    <form>
+    </main>
+        
+    <form onSubmit={sendMessage}>
       <input value={formValue} onChange={(e)=> setFormValue(e.target.value)}/>
 
-      <button type="submit">Send</button>
+      <button type="submit" >Send</button>
       
     </form>
     </> 
@@ -109,13 +111,12 @@ function ChatMessage(props){
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received'; 
 
-  return(
+  return (
     <div className={`message ${messageClass}`}>
-
-      <img src={photoURL}/>
-      <p>{text}</p>
+      <img src={photoURL||'https://api.adorable.io/avatars/23/abott@adorable.png'} alt="Girl in a jacket"/>
+        <p>{text}</p>
     </div>
-  )
+  );
 }
 
 export default App;
